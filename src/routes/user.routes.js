@@ -17,6 +17,12 @@ router.route("/register").post(
     ),
     registerUser
 )
+
+
+
 router.route("/login").post(loginUser)
 router.route("/logout").post(verifyJWT,logoutUser)
+
+//router that will help user to add their selected food
+
 export default router
