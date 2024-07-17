@@ -62,16 +62,13 @@ const registerFoodJson=asyncHandler(async(req,res)=>{
         throw new ApiError(402,"Something went wrong while uploading json Data.")
     }
 })
-
-
 const trackFood=asyncHandler(async(req,res)=>{
 
 
-    const {userId,foodId,quantity}=req.body;
-    console.log(userId);
+    const food=req.body;
     try{
 
-        const data=await Track.create({userId,foodId,quantity});
+        const data=await Track.create(food);
         res
         .status(201)
         .json(
@@ -82,7 +79,55 @@ const trackFood=asyncHandler(async(req,res)=>{
             )
         )
     }catch(error){
-        throw new ApiError(402,"Error while Tracking User Food")
+        throw new ApiError(402,"Error while adding to track User Food")
     }
 })
-export {searchFood,registerFoodJson,trackFood}
+const trackMyFood=asyncHandler(async(req,res)=>{
+    const userid=req.body.userid;
+    try {
+        const data=await Track.find({userId:userid})
+        res.json(
+            new ApiResponse(
+                201,
+                data,
+                "Fetching Done!!"
+            )
+        )
+    } catch (error) {
+        throw new ApiError(403,"Something went wrong while fetching the user tracked food.")
+    }
+})
+
+const deleteTrackedFood=asyncHandler(async(req,res)=>{
+    const userid=req.body.userId;
+    const foodid=req.body.foodId;
+    const qntity=req.body.quantity
+
+   try {
+     const data=await Track.findOneAndDelete({
+        $and:[
+            {userId:userid},
+            {foodId:foodid},
+            {quantity:qntity}
+        ]
+     })
+     console.log(data)
+     if(data)
+    {
+        res.json(
+            new ApiResponse(
+                210,
+                data,
+                "Food Item removed Sucessfully."
+            )
+        )
+    }
+    throw new ApiError(
+        404,
+        "Something went wrong while performing delete operation"
+    )
+   } catch (error) {
+    throw new ApiError(500,"Something went wrong while removing food Item from Tracking Database.")
+   }
+})
+export {searchFood,registerFoodJson,trackFood,trackMyFood,deleteTrackedFood}

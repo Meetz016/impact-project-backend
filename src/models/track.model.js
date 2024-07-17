@@ -9,7 +9,7 @@ const trackSchema=new mongoose.Schema({
         required:true
     },
     //foodid
-    userId:{
+    foodId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Food",
         required:true
