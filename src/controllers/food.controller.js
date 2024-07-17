@@ -12,38 +12,35 @@ dotenv.config()
 const searchFood=asyncHandler(async(req,res)=>{
 
 
-    let food;
     try {
         const foodName=req.params.name
-        food=await Food.find({
+        const food=await Food.find({
             name:{
                 $regex:foodName,
                 $options:'i',
             },
         }).select("-_id -createdAt -updatedAt -__v")
-        
-        console.log(food)
+        if (food.length>0) {
+            res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    food,
+                    "Search Successful"
+                )
+            )
+        }else{
+            res
+            .status(400)
+            .json(
+                new ApiResponse(401,"Food Item is either Not available or not a valid search.","Enter a valid food item.")
+            )
+        }
     } catch (error) {
         throw new ApiError(404,error?.message)
     }
 
-    if (food.length>0) {
-        res
-        .status(200)
-        .json(
-            new ApiResponse(
-                200,
-                food,
-                "Search Successful"
-            )
-        )
-    }else{
-        res
-        .status(400)
-        .json(
-            new ApiResponse(401,"Food Item is either Not available or not a valid search.","Enter a valid food item.")
-        )
-    }
 })
 
 
