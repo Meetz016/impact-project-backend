@@ -21,6 +21,6 @@ app.use(cookieParser())
 import userRoute from "./routes/user.routes.js"
 import foodRoute from "./routes/food.routes.js"
 app.use("/api/v1/user",userRoute)
-app.use("/api/v1/search",foodRoute)
+app.use("/api/v1/food",foodRoute)
 
 export {app}

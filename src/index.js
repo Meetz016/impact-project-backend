@@ -13,8 +13,6 @@ connectDB()
     app.listen(process.env.PORT || 8000,()=>{
         console.log("server started at:",process.env.PORT)
     })
-    registerFoodJson();
-
 })
 .catch((error)=>{
     console.log("connection failed:",error)
