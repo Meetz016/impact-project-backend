@@ -233,15 +233,15 @@ const forgotUserPassword=asyncHandler(async(req,res)=>{
         }
         //control reached here means user does exists so simply reset the password
         user.password=newPass;
-        user.save();
+        await user.save();
 
         res
-        .status(201)
+        .status(200)
         .json(
             new ApiResponse(
                 200,
                 {},
-                "Password forget was successful."
+                "Password reset was successful."
             )
         )
     } catch (error) {
