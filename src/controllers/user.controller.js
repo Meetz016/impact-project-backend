@@ -208,4 +208,47 @@ const resetUserPassword=asyncHandler(async(req,res)=>{
       )
     }
 })
-export {registerUser,loginUser,logoutUser,resetUserPassword}
+const forgotUserPassword=asyncHandler(async(req,res)=>{
+    //to implement this we need not to be logged in just need to check weather user is registered or not
+    //we might get username or email in req.body
+    const {username,email,newPass}=req.body;
+
+    if(!username && !email){
+        throw new ApiError(
+            400,
+            "Atleast username or email is required."
+        )
+    }
+
+    try {
+        const user=await User.findOne({
+            $or:[{email},{username}]
+        }).select("+password")
+    
+        if(!user){
+            throw new ApiError(
+                409,
+                "User with this username or email does not exists."
+            )
+        }
+        //control reached here means user does exists so simply reset the password
+        user.password=newPass;
+        user.save();
+
+        res
+        .status(201)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "Password forget was successful."
+            )
+        )
+    } catch (error) {
+        throw new ApiError(
+            500,
+            "Something was not right while handling DB operations."
+        )
+    }
+})
+export {registerUser,loginUser,logoutUser,resetUserPassword,forgotUserPassword}
