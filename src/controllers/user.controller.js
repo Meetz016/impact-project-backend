@@ -5,6 +5,7 @@ import dotenv from "dotenv"
 import {uploader} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiResponse.js";
 import jwt from 'jsonwebtoken';
+import { isValidObjectId } from "mongoose";
 dotenv.config()
 
 // mongoDb provides user._id
@@ -71,7 +72,6 @@ const registerUser=asyncHandler( async(req,res)=>{
     )
 
 } )
-
 const loginUser=asyncHandler(async(req,res)=>{
 
     //username and password take and input
@@ -145,8 +145,6 @@ const logoutUser=asyncHandler(async(req,res)=>{
         new ApiResponse(200,{},"User is now logged Out...")
     )
 })
-
-
 const refreshAccessToken=asyncHandler(async(req,res)=>{
     const incomingRefreshToken=req.cookies.refreshToken || req.body.refreshToken
 
@@ -164,4 +162,50 @@ const refreshAccessToken=asyncHandler(async(req,res)=>{
 
     
 })
-export {registerUser,loginUser,logoutUser}
+const resetUserPassword=asyncHandler(async(req,res)=>{
+    //verifyJWT will ensure that a user that is logged in is attempting to reset the password
+
+    const password=req.body.password
+    const newPassword=req.body.newPassword
+    const user=req.user;
+    if(!user){
+        throw new ApiError(409,"Unauthorized User!")
+    }
+    if(!password || !newPassword){
+        throw new ApiError(
+            400,
+            "Both the fields are required."
+        )
+    }
+
+    //means old password is valid
+    try {
+
+        const dbUser=await User.findById(user._id).select("+password")
+        const isPassValid=await dbUser.isPasswordCorrect(password);
+        if(!isPassValid){
+            throw new ApiError(
+                401,
+                "The current password provided is not matching.."
+            )
+        }
+        dbUser.password=newPassword;
+        dbUser.save();
+
+        res
+        .status(200)
+        .json(
+            new ApiResponse(
+                200,
+                {},
+                "User Password reset is Sucessful."
+            )
+        )
+    } catch (error) {
+        throw new ApiError(
+            401,
+            "Failed to reset User Password."
+      )
+    }
+})
+export {registerUser,loginUser,logoutUser,resetUserPassword}

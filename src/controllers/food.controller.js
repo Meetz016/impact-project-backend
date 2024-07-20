@@ -85,7 +85,10 @@ const trackFood=asyncHandler(async(req,res)=>{
 const trackMyFood=asyncHandler(async(req,res)=>{
     const userid=req.body.userid;
     try {
-        const data=await Track.find({userId:userid})
+        const data = await Track.find({ userId: userid })
+    .populate('foodId')
+    .populate('userId');
+
         res.json(
             new ApiResponse(
                 201,
