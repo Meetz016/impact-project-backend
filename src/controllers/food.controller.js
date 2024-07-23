@@ -63,8 +63,6 @@ const registerFoodJson=asyncHandler(async(req,res)=>{
     }
 })
 const trackFood=asyncHandler(async(req,res)=>{
-
-
     const food=req.body;
     try{
 
@@ -83,7 +81,8 @@ const trackFood=asyncHandler(async(req,res)=>{
     }
 })
 const trackMyFood=asyncHandler(async(req,res)=>{
-    const userid=req.body.userid;
+    const userid=req.body.userId;
+    console.log(userid)
     try {
         const data = await Track.find({ userId: userid })
     .populate('foodId')
@@ -133,4 +132,31 @@ const deleteTrackedFood=asyncHandler(async(req,res)=>{
     throw new ApiError(500,"Something went wrong while removing food Item from Tracking Database.")
    }
 })
-export {searchFood,registerFoodJson,trackFood,trackMyFood,deleteTrackedFood}
+
+
+const trackByDate=asyncHandler(async(req,res)=>{
+    const date=req.params.date;
+    const user=req.user;
+
+    //extracted date from req.params
+    console.log(date)
+
+    try{
+
+        const data=await Track.find({userId:user._id,eatDate:date})
+
+        res.json(
+            new ApiResponse(
+                200,
+                data,
+                "Data Fetch is sucessful"
+            )
+        )
+    }catch(err){
+        throw new ApiError(
+            500,
+            err?.message || "Failed to load Info from given Date"
+        )
+    }
+})
+export {searchFood,registerFoodJson,trackFood,trackMyFood,deleteTrackedFood,trackByDate}
